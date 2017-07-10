@@ -1,6 +1,10 @@
 # Reuters-full-data-set
 Full unofficial data set of Reuters composed of 8,551,441 news titles, links and timestamps (Jan 2007 - Aug 2016).
 
+**NB: To generate it from scrach (from 2007 up to today), please scroll down.**
+
+## Using the pre-existing one
+
 ```
 git clone https://github.com/philipperemy/Reuters-full-data-set.git
 cd Reuters-full-data-set
@@ -26,4 +30,17 @@ Each news is a `dict` of the form:
 ts: timestamp of the form 20070228 11:46 AM EST
 title: title of the news
 href: link to the article to get the full content
+```
+
+## Generate your own data set
+
+Nothing could be easier. Just run those commands to generate pickle and CSV files.
+
+I get the data from `http://www.reuters.com/resources/archive/us`.
+
+```
+git clone https://github.com/philipperemy/Reuters-full-data-set.git
+cd Reuters-full-data-set
+python3 generate.py
+python3 dump_to_csv.py DATA_DIR # where DATA_DIR is the directory contained your pickle files from generate.py
 ```
