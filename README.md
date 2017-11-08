@@ -44,3 +44,8 @@ cd Reuters-full-data-set
 python3 generate.py
 python3 dump_to_csv.py DATA_DIR # where DATA_DIR is the directory contained your pickle files from generate.py
 ```
+
+## Other languages exist
+
+- Japanese: http://jp.reuters.com/resources/archive/jp/20160414.html
+
