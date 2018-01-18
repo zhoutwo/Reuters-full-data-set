@@ -41,6 +41,7 @@ I get the data from `http://www.reuters.com/resources/archive/us`.
 ```
 git clone https://github.com/philipperemy/Reuters-full-data-set.git
 cd Reuters-full-data-set
+pip3 install beautifulsoup4 requests
 python3 generate.py
 python3 dump_to_csv.py DATA_DIR # where DATA_DIR is the directory contained your pickle files from generate.py
 ```
