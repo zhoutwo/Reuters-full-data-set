@@ -8,7 +8,7 @@ Full unofficial data set of Reuters composed of 8,551,441 news titles, links and
 ```
 git clone https://github.com/philipperemy/Reuters-full-data-set.git
 cd Reuters-full-data-set
-python read.py
+python3 read.py
 ```
 
 ```
