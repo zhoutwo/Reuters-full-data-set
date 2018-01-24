@@ -33,7 +33,9 @@ def run_full():
     end_date = today.date()
     iterations = 0
 
-    forbidden_terms = ['PRESS DIGEST']
+    forbidden_terms = [
+        'PRESS DIGEST'
+    ]
     reuters_label = '(Reuters) - '
 
     for single_date in date_range(start_date, end_date):
@@ -52,14 +54,33 @@ def run_full():
 
                 title = str(target.contents[0].contents[0])
 
+                forbidden = False
                 for forbidden_term in forbidden_terms:
                     if forbidden_term in title:
-                        continue
+                        forbidden = True
+                        break
 
+                if forbidden:
+                    continue
+
+                title = re.sub('GLOBAL ECONOMY.*-', '', title)
+                title = re.sub('FACTBOX.*-', '', title)
+                title = re.sub('CORRECTED.*-', '', title)
+                title = title.replace('Factbox:', '')
+                title = re.sub('CANADA STOCKS.*-', '', title)
+                title = re.sub('US STOCKS SNAPSHOT.*-', '', title)
+                title = re.sub('FOREX.*-', '', title)
+                title = re.sub('WRAPUP.*-', '', title)
+                title = re.sub('PRECIOUS.*-', '', title)
+                title = re.sub('GLOBAL MARKETS.*-', '', title)
+                title = re.sub('RPT.*-', '', title)
                 title = re.sub('UPDATE.*-', '', title)
+
                 title = title.replace(' - sources', '')
                 title = title[:-8] + re.sub(' - .*', '', title[-8:])
                 title = title.strip()
+                if len(title) < 20 or title[0].islower() or len(title.split()) < 5:
+                    continue
                 title = title.encode('UTF-8')
 
                 href = str(target.contents[0].attrs['href'])
