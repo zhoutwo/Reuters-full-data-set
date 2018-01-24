@@ -10,7 +10,7 @@ import requests
 def get_soup_from_link(link):
     if not link.startswith('http://www.reuters.com'):
         link = 'http://www.reuters.com' + link
-    print(link)
+    # print(link)
     response = requests.get(link)
     assert response.status_code == 200
     return bs4.BeautifulSoup(response.content, 'html.parser')
@@ -29,9 +29,13 @@ def run_full():
         os.makedirs(output_dir)
 
     print('Generating the Full dataset in : {}'.format(output_dir))
-    start_date = date(2007, 1, 1)
+    start_date = date(2015, 1, 1)
     end_date = today.date()
     iterations = 0
+
+    forbidden_terms = ['PRESS DIGEST']
+    reuters_label = '(Reuters) - '
+
     for single_date in date_range(start_date, end_date):
         output = []
         string_date = single_date.strftime("%Y%m%d")
@@ -44,9 +48,20 @@ def run_full():
                     timestamp = str(string_date) + str(target.contents[1])
                 except Exception:
                     timestamp = None
-                    print('EXCEPTION RAISED. Timestamp set to None. Resuming.')
+                    # print('EXCEPTION RAISED. Timestamp set to None. Resuming.')
+
                 title = str(target.contents[0].contents[0])
+
+                for forbidden_term in forbidden_terms:
+                    if forbidden_term in title:
+                        continue
+
                 title = re.sub('UPDATE.*-', '', title)
+                title = title.replace(' - sources', '')
+                title = title[:-8] + re.sub(' - .*', '', title[-8:])
+                title = title.strip()
+                title = title.encode('UTF-8')
+
                 href = str(target.contents[0].attrs['href'])
                 try:
                     article_soup = get_soup_from_link(href)
@@ -54,32 +69,36 @@ def run_full():
                     for body_sentence in body_sentences:
                         body_sentence = str(body_sentence)
                         body_sentence = body_sentence.strip('</p>')
-                        reuters_label = '(Reuters) - '
+
                         if reuters_label in body_sentence:
                             body_sentence = body_sentence[body_sentence.find(reuters_label)+len(reuters_label):]
                             body_sentence = re.sub('\(.*\) ', '', body_sentence)
+                            body_sentence = re.sub('\[.*\] ', '', body_sentence)
+
+                            if len(body_sentence) < len(title):
+                                continue
 
                             sentence_ending = '. '
                             if sentence_ending in body_sentence:
                                 body_sentence = body_sentence[:body_sentence.find('. ') + 1]
+                                body_sentence = body_sentence.encode('UTF-8')
 
-                                print('iterations = {}, date = {}, ts = {}, t = {}, h = {}, fl = {}'.format(str(iterations).zfill(9),
-                                                                                                  string_date,
-                                                                                                  timestamp, title, href,
-                                                                                                  body_sentence))
+                                print('iterations = {}, t = {}, h = {}, fl = {}'.format(str(iterations).zfill(9), title, href, body_sentence))
                                 output.append({'ts': timestamp, 'title': title, 'href': href, 'first_line': body_sentence})
                                 iterations += 1
-                            break
+                                break
 
                 except Exception:
-                    print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(href))
+                    pass
+                    # print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(href))
 
             output_filename = os.path.join(output_dir, string_date + '.pkl').format(output_dir, string_date)
             with open(output_filename, 'wb') as w:
                 pickle.dump(output, w)
             print('-> written dump to {}'.format(output_filename))
         except Exception:
-            print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(link))
+            pass
+            # print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(link))
 
 
 if __name__ == '__main__':

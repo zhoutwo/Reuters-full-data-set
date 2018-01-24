@@ -12,7 +12,7 @@ def read():
         if ls.endswith('.pkl'):
             with open('data/' + ls, 'rb') as f:
                 if PYTHON_3:
-                    data = pickle.load(f, encoding='latin1')
+                    data = pickle.load(f, encoding='UTF-8')
                 else:
                     data = pickle.load(f)
                 for datum in data:
