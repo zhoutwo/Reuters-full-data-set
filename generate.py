@@ -101,7 +101,7 @@ def run_full():
 
                             sentence_ending = '. '
                             if sentence_ending in body_sentence:
-                                body_sentence = body_sentence[:body_sentence.find('. ') + 1]
+                                # body_sentence = body_sentence[:body_sentence.find('. ') + 1]
                                 body_sentence = body_sentence.encode('UTF-8')
 
                                 print('iterations = {}, t = {}, h = {}, fl = {}'.format(str(iterations).zfill(9), title, href, body_sentence))
