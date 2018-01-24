@@ -23,11 +23,11 @@ def read(data_dir):
                     line += sep
                     line += '"' + ts + '"'
                     line += sep
-                    line += '"' + datum['title'] + '"'
+                    line += '"' + str(datum['title'], 'UTF-8') + '"'
                     line += sep
                     line += '"' + datum['href'] + '"'
                     line += sep
-                    line += '"' + datum['first_line'] + '"'
+                    line += '"' + str(datum['first_line'], 'UTF-8') + '"'
                     line += '\n'
 
                     w.write(line)
