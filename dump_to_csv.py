@@ -26,6 +26,8 @@ def read(data_dir):
                     line += '"' + datum['title'] + '"'
                     line += sep
                     line += '"' + datum['href'] + '"'
+                    line += sep
+                    line += '"' + datum['first_line'] + '"'
                     line += '\n'
 
                     w.write(line)

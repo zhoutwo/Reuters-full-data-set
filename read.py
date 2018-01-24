@@ -16,7 +16,7 @@ def read():
                 else:
                     data = pickle.load(f)
                 for datum in data:
-                    print('ts = {}, t = {}, h= {}'.format(datum['ts'], datum['title'], datum['href']))
+                    print('ts = {}, t = {}, h = {}, fl = {}'.format(datum['ts'], datum['title'], datum['href'], datum['first_line']))
 
 
 if __name__ == '__main__':

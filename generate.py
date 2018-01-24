@@ -1,4 +1,5 @@
 import os
+import re
 import pickle
 from datetime import timedelta, date, datetime
 
@@ -38,26 +39,47 @@ def run_full():
         try:
             soup = get_soup_from_link(link)
             targets = soup.find_all('div', {'class': 'headlineMed'})
-        except Exception:
-            print('EXCEPTION RAISED. Could not download link : {}. Resuming anyway.'.format(link))
-            targets = []
-        for target in targets:
-            try:
-                timestamp = str(string_date) + str(target.contents[1])
-            except Exception:
-                timestamp = None
-                print('EXCEPTION RAISED. Timestamp set to None. Resuming.')
-            title = str(target.contents[0].contents[0])
-            href = str(target.contents[0].attrs['href'])
-            print('iterations = {}, date = {}, ts = {}, t = {}, h= {}'.format(str(iterations).zfill(9), string_date,
-                                                                              timestamp, title, href))
-            output.append({'ts': timestamp, 'title': title, 'href': href})
-            iterations += 1
+            for target in targets:
+                try:
+                    timestamp = str(string_date) + str(target.contents[1])
+                except Exception:
+                    timestamp = None
+                    print('EXCEPTION RAISED. Timestamp set to None. Resuming.')
+                title = str(target.contents[0].contents[0])
+                title = re.sub('UPDATE.*-', '', title)
+                href = str(target.contents[0].attrs['href'])
+                try:
+                    article_soup = get_soup_from_link(href)
+                    body_sentences = article_soup.select('div.StandardArticleBody_body_1gnLA > p')
+                    for body_sentence in body_sentences:
+                        body_sentence = str(body_sentence)
+                        body_sentence = body_sentence.strip('</p>')
+                        reuters_label = '(Reuters) - '
+                        if reuters_label in body_sentence:
+                            body_sentence = body_sentence[body_sentence.find(reuters_label)+len(reuters_label):]
+                            body_sentence = re.sub('\(.*\) ', '', body_sentence)
 
-        output_filename = os.path.join(output_dir, string_date + '.pkl').format(output_dir, string_date)
-        with open(output_filename, 'wb') as w:
-            pickle.dump(output, w)
-        print('-> written dump to {}'.format(output_filename))
+                            sentence_ending = '. '
+                            if sentence_ending in body_sentence:
+                                body_sentence = body_sentence[:body_sentence.find('. ') + 1]
+
+                                print('iterations = {}, date = {}, ts = {}, t = {}, h = {}, fl = {}'.format(str(iterations).zfill(9),
+                                                                                                  string_date,
+                                                                                                  timestamp, title, href,
+                                                                                                  body_sentence))
+                                output.append({'ts': timestamp, 'title': title, 'href': href, 'first_line': body_sentence})
+                                iterations += 1
+                            break
+
+                except Exception:
+                    print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(href))
+
+            output_filename = os.path.join(output_dir, string_date + '.pkl').format(output_dir, string_date)
+            with open(output_filename, 'wb') as w:
+                pickle.dump(output, w)
+            print('-> written dump to {}'.format(output_filename))
+        except Exception:
+            print('EXCEPTION RAISED. Could not download link : {}. Skipping.'.format(link))
 
 
 if __name__ == '__main__':
