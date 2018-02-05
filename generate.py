@@ -29,7 +29,7 @@ def run_full():
         os.makedirs(output_dir)
 
     print('Generating the Full dataset in : {}'.format(output_dir))
-    start_date = date(2015, 1, 1)
+    start_date = date(2016, 1, 1)
     end_date = today.date()
     iterations = 0
 
@@ -74,9 +74,17 @@ def run_full():
                 title = re.sub('PRECIOUS.*-', '', title)
                 title = re.sub('GLOBAL MARKETS.*-', '', title)
                 title = re.sub('RPT.*-', '', title)
+                title = re.sub('MIDEAST STOCKS.*-', '', title)
+                title = re.sub('INTERVIEW.*-', '', title)
+                title = title.replace('Exclusive:', '')
                 title = re.sub('UPDATE.*-', '', title)
-
-                title = title.replace(' - sources', '')
+                title = re.sub(' -.*', '', title)
+                title = title.replace('-source', '')
+                title = title.replace('-sources', '')
+                title = title.replace(': sources', '')
+                title = title.replace('- sources', '')
+                title = title.replace(': source', '')
+                title = title.replace('- source', '')
                 title = title[:-8] + re.sub(' - .*', '', title[-8:])
                 title = title.strip()
                 if len(title) < 20 or title[0].islower() or len(title.split()) < 5:
